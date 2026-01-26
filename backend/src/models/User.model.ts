@@ -1,0 +1,67 @@
+import mongoose,{Document, model, Schema} from "mongoose"
+
+export interface IUser extends Document{
+    email:string;
+    password:string;
+    name?:string;
+    credits:number;
+    refreshToken?:string;
+    isActive:boolean;
+    isEmailVerified:boolean;
+    emailVerification?:string;
+    emailVerificationExpires?:Date;
+    createdAt:Date;
+    updatedAt:Date
+}
+
+const userSchema=new Schema<IUser>(
+    {
+    email:{
+        type:String,
+        required:[true, "Email is required'"],
+        unique:true,
+        lowercase:true,
+        trim:true
+    },
+    password:{
+        type:String,
+        required:[true, "Password is required'"],
+        minlength:[8, "Password must be at least 8 characters"],
+        select:false
+    },
+    name:{
+        type:String,
+        trim:true
+    },
+    credits:{
+        type:Number,
+        default:5  
+    },
+    refreshToken:{
+        type:String,
+        select:false
+    },
+    isActive:{
+        type:Boolean,
+        default:true
+    },
+    isEmailVerified:{
+        type:Boolean,
+        default:false
+    },
+    emailVerification:{
+        type:String,
+        select:false
+    },
+    emailVerificationExpires:{
+        type:Date,
+        select:false
+    }
+
+    },
+    {
+        timestamps:true
+    }
+);
+
+export const User=mongoose.model<IUser>("User", userSchema)

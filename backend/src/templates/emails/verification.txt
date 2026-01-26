@@ -1,0 +1,12 @@
+Welcome to Headshot Generator
+   {{name}}
+
+Thank you for registering. Please verify your email address by clicking the bellow button
+
+     {{verificationUrl}} Verify Email Address
+    
+Or copy and paste this link into your browser: 
+  {{verificationUrl}}
+
+This link will expire after 24 hours.
+If you did'nt create an account, Please ignore thi email
