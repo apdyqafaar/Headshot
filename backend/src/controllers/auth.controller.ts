@@ -1,4 +1,5 @@
 import { authService } from "@/services"
+import { validationErrors } from "@/util/errors"
 import { createdResponse } from "@/util/response"
 import type { Request, Response } from "express"
 
@@ -14,4 +15,14 @@ export const register=async(req:Request, res:Response)=>{
      }})
 
 
+}
+
+export const verifyEmail=async(req:Request, res:Response)=>{
+  const {token}=req.query
+
+  if(!token || typeof token !== "string"){
+   throw new validationErrors("verification token is required")
+  }
+
+//   verification service
 }

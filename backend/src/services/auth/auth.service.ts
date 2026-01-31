@@ -2,7 +2,7 @@ import { IUser, User } from "@/models/User.model"
 import { registerInput } from "@/validaors/auth.validator"
 import { passwordService } from "./methods/pasword.service"
 import { verificationService } from "./methods/verification.service"
-import { ConflictError, ExternalServiceError } from "@/util/errors"
+import { ConflictError, ExternalServiceError, validationErrors } from "@/util/errors"
 import { emailService } from "../notification/email.service"
 import { loger } from "@/util/logger"
 
@@ -12,7 +12,7 @@ export class AuthService{
        
         // normalize email to lowercase
         const normalizedEmail=this.normalizeEmail(input.email)
-        const uxisitingUser= await this.checkUserExists(normalizedEmail)
+         await this.checkUserExists(normalizedEmail)
 
         // hashing password first
         const hashedPassword= await passwordService.hashPassword(input.password)
@@ -46,6 +46,31 @@ export class AuthService{
 
 
     };
+
+
+    // verification email
+    async verifyEmail(token:string):Promise<void>{
+     const user=await User.findOne({
+      emailVerification:token
+     }).select("+emailVerificationExpires +emailVerification")
+
+     if(!user){
+      throw new validationErrors("Invalid verification token")
+     }
+
+    //  check if user already verified
+    if(user?.isEmailVerified){
+      throw new ConflictError("Email already verified")
+    }
+
+    //  check if token expired
+    if(!user.emailVerificationExpires || new Date() > user?.emailVerificationExpires){
+       throw new validationErrors("Verification token has expired")
+    }
+    // verifying email
+   
+
+    }
 
     private async checkUserExists(email:string):Promise<void>{
       const existingUser=await User.findOne({email})

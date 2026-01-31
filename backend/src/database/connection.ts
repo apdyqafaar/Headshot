@@ -14,10 +14,8 @@ export const connectDatabase=async():Promise<void>=>{
 
 mongoose.connection.on("disconnected", ()=>{
     loger.error("Disconnected from database")
-    throw new Error("Disconnected from database")
 })
 
 mongoose.connection.on("error", (error)=>{
     loger.error("Error Connecting to database ", error)
- throw error
 })

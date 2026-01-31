@@ -5,6 +5,6 @@ export const authService={
 
     // register new user
     register:async(data:RegisterInput):Promise<RegisterResponse>=>{
-     return  api.post<RegisterResponse>("/auth/register", data)
+     return await api.post<RegisterResponse>("/auth/register", data)
     }
 }

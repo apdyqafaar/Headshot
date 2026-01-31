@@ -13,4 +13,8 @@ export const registerSchema=z.object({
     name:z.string().trim().optional()
 })
 
+export const verifyEmailSchema=z.object({
+    token:z.string({error:"Verification token is required"}).min(1)
+})
+
 export type registerInput=z.infer<typeof registerSchema>
