@@ -13,3 +13,18 @@ export const useRegister =()=>{
         mutationFn:(data:RegisterInput)=> authService.register(data)
     })
 }
+
+
+export const useVerifyEmail=()=>{
+    return useMutation({
+        mutationFn:(token:string)=>  authService.VerifyEmail(token)
+    })
+}
+
+
+
+export const useResendVerification=()=>{
+    return useMutation({
+        mutationFn:(email:string)=>  authService.resendVerification(email)
+    })
+}

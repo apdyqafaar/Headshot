@@ -59,8 +59,8 @@ export class EmailService{
     // ensure transporter is configured
     private ensureTransporter():void{
         if(!this.transport){
-            loger.warn('SMPT transporter is not initialized')
-           throw new ExternalServiceError('Email service: SMPT transporter is not initialized')
+            loger.warn('SMTP transporter is not initialized')
+           throw new ExternalServiceError('Email service: SMTP transporter is not initialized')
         }
     }
 

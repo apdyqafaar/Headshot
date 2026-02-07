@@ -2,7 +2,7 @@ import { IUser, User } from "@/models/User.model"
 import { registerInput } from "@/validaors/auth.validator"
 import { passwordService } from "./methods/pasword.service"
 import { verificationService } from "./methods/verification.service"
-import { ConflictError, ExternalServiceError, validationErrors } from "@/util/errors"
+import { ConflictError, ExternalServiceError, NotFoundError, validationErrors } from "@/util/errors"
 import { emailService } from "../notification/email.service"
 import { loger } from "@/util/logger"
 
@@ -62,15 +62,49 @@ export class AuthService{
     if(user?.isEmailVerified){
       throw new ConflictError("Email already verified")
     }
-
+ 
     //  check if token expired
     if(!user.emailVerificationExpires || new Date() > user?.emailVerificationExpires){
        throw new validationErrors("Verification token has expired")
     }
+
     // verifying email
-   
+    user.isEmailVerified=true
+    user.emailVerification=undefined
+    user.emailVerificationExpires=undefined
+
+    await user.save()
 
     }
+
+    // resend email verification token
+     async resendEmailVerification(email:string):Promise<void>{
+         const normalizedEmail=this.normalizeEmail(email)
+         const user=await User.findOne({email:normalizedEmail})
+         if(!user){
+          throw new NotFoundError("User not found")
+         }
+
+         if(user.isEmailVerified){
+          throw new ConflictError("Email is already verified")
+         }
+
+        //  generating new verification
+        const verificationToken=verificationService.generateVerificationToken()
+        
+        const verificationTokenExpires=verificationService.generateExpirationDate()
+
+        user.emailVerification=verificationToken
+        user.emailVerificationExpires=verificationTokenExpires
+        await user.save()
+
+        try {
+          await emailService.sendVerificationEmail(normalizedEmail,user.name||"", verificationToken)
+        } catch (error) {
+          loger.error("Failed to resend email verification token", error)
+          throw new ExternalServiceError("Email service failed to resend verification token")
+        }
+     }
 
     private async checkUserExists(email:string):Promise<void>{
       const existingUser=await User.findOne({email})

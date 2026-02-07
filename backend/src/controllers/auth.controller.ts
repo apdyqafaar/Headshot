@@ -1,6 +1,6 @@
 import { authService } from "@/services"
 import { validationErrors } from "@/util/errors"
-import { createdResponse } from "@/util/response"
+import { createdResponse, successResponse } from "@/util/response"
 import type { Request, Response } from "express"
 
 export const register=async(req:Request, res:Response)=>{
@@ -25,4 +25,20 @@ export const verifyEmail=async(req:Request, res:Response)=>{
   }
 
 //   verification service
+await authService.verifyEmail(token)
+
+return successResponse(res,{message:"Email was verified successfully"}, "Email was verified successfully")
+}
+
+// resend verification email
+export const resendVerificationEmail= async(req:Request, res:Response)=>{
+       const {email}=req.body
+       if(!email){
+        throw new validationErrors("Email is required")
+       }
+
+
+      //  resend service
+      await authService.resendEmailVerification(email)
+      return successResponse(res, {message:"Verification email sent successfully"}, 'Verification email sent successfully')
 }

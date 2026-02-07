@@ -9,3 +9,8 @@ export interface RegisterInput{
 export interface RegisterResponse{
     user:User
 }
+
+export interface veryEmailResponse{
+    success:boolean;
+    message:string
+}
