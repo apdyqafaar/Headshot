@@ -14,3 +14,15 @@ export interface veryEmailResponse{
     success:boolean;
     message:string
 }
+
+
+export interface LoginInput{
+       email:string,
+    password:string
+}
+
+
+export interface loginResponse{
+    user:User;
+    message:string
+}

@@ -1,8 +1,16 @@
+import { config } from "@/config"
 import { authService } from "@/services"
 import { validationErrors } from "@/util/errors"
 import { createdResponse, successResponse } from "@/util/response"
 import type { Request, Response } from "express"
 
+const cookieOptions={
+  httpOnly:true,
+  secure:config.env==="production",
+  sameSite:"lax" as const,
+  path:"/"
+}
+// register user
 export const register=async(req:Request, res:Response)=>{
 
     const {user}= await authService.registerUser(req.body)
@@ -17,6 +25,7 @@ export const register=async(req:Request, res:Response)=>{
 
 }
 
+// verify email 
 export const verifyEmail=async(req:Request, res:Response)=>{
   const {token}=req.query
 
@@ -41,4 +50,37 @@ export const resendVerificationEmail= async(req:Request, res:Response)=>{
       //  resend service
       await authService.resendEmailVerification(email)
       return successResponse(res, {message:"Verification email sent successfully"}, 'Verification email sent successfully')
+}
+
+
+// login user
+export const login=async(req:Request, res:Response)=>{
+   const {email, password}=req.body
+
+   if(!email || !password){
+    throw new validationErrors("Email and password is required")
+   }
+
+  //  login service
+  const {accessToken, refreshToken, user}=await authService.login(email, password)
+
+  // we have update the cookie of the browser
+  res.cookie("accessToken", accessToken, {
+    ...cookieOptions,
+    maxAge:15 *60 *1000, // 15 minutes
+  })
+   res.cookie("refreshToken", refreshToken, {
+    ...cookieOptions,
+    maxAge:7 *24 *60 *60 *1000, // 7 days
+  })
+
+
+  return successResponse(res, {
+    user:{
+      id:user._id,
+      email:user.email,
+      name:user.name || ""
+    }
+  }, "Login successful")
+  
 }

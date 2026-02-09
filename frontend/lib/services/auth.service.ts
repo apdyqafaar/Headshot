@@ -1,5 +1,5 @@
 import { api } from "../api";
-import { RegisterInput, RegisterResponse, veryEmailResponse } from "../types";
+import { LoginInput, loginResponse, RegisterInput, RegisterResponse, veryEmailResponse } from "../types";
 
 export const authService={
 
@@ -16,5 +16,10 @@ export const authService={
     // resend verification
     resendVerification:async(email:string):Promise<veryEmailResponse>=>{
         return await api.post<veryEmailResponse>("/auth/resend-verification", {email})
+    },
+
+    // login
+    login: async(data:LoginInput):Promise<loginResponse>=>{
+    return await api.post<loginResponse>("/auth/login", data)
     }
 }

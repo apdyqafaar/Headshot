@@ -1,10 +1,11 @@
-import { IUser, User } from "@/models/User.model"
+import { IUser, User, UserRole } from "@/models/User.model"
 import { registerInput } from "@/validaors/auth.validator"
 import { passwordService } from "./methods/pasword.service"
 import { verificationService } from "./methods/verification.service"
-import { ConflictError, ExternalServiceError, NotFoundError, validationErrors } from "@/util/errors"
+import { ConflictError, ExternalServiceError, NotFoundError, UnauthorizedError, validationErrors } from "@/util/errors"
 import { emailService } from "../notification/email.service"
 import { loger } from "@/util/logger"
+import { TokenPayload, tokenService } from "./token.service"
 
 export class AuthService{
 
@@ -28,7 +29,8 @@ export class AuthService{
             name:input.name || "",
             emailVerification:verificationToken,
             emailVerificationExpires:verificationExpires,
-            isEmailVerified:false
+            isEmailVerified:false,
+            role:UserRole.USER
         })
 
         // TODO: send verification email
@@ -105,6 +107,53 @@ export class AuthService{
           throw new ExternalServiceError("Email service failed to resend verification token")
         }
      }
+
+    //  login user
+    async login(email:string, password:string):Promise<{user:IUser, accessToken:string, refreshToken:string}>{
+      // normalizing meial
+      const normalizedEmail=this.normalizeEmail(email)
+
+      // checking if this email exists
+      const user=await User.findOne({email:normalizedEmail}).select("+password")
+
+      if(!user) {
+        throw new NotFoundError("User not found")
+      }
+
+      // is active the user
+      if(!user.isActive){
+         throw new UnauthorizedError("User is not active")
+      }
+
+      // is email verified
+      if(!user.isEmailVerified){
+         throw new UnauthorizedError("Email is not verified")
+      }
+
+
+      // compare
+      const isPasswordValid=await passwordService.varifyPassword({password:password, hash:user.password})
+      if(!isPasswordValid){
+        throw new UnauthorizedError("Invalid email or password")
+      }
+
+      // generate token access `this is the fun part huhh`
+       const tokenPayload:TokenPayload={
+        userId:user._id.toString(),
+        email:normalizedEmail,
+        role:user.role
+       }
+       const {accessToken, refreshToken}=tokenService.generateTokenPair(tokenPayload)
+       user.refreshToken=refreshToken
+       await user.save()
+
+       return {
+        user, 
+        accessToken,
+        refreshToken
+       }
+
+    }
 
     private async checkUserExists(email:string):Promise<void>{
       const existingUser=await User.findOne({email})
