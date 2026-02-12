@@ -155,6 +155,44 @@ export class AuthService{
 
     }
 
+    // get current user service
+    async getCurrentUser(userId:string):Promise<IUser>{
+      const user=await User.findById(userId)
+        if(!user){
+          throw new NotFoundError("User not found")
+        }
+
+        return user
+    }
+
+    // refresh token service
+    async refreshAccessToken(refreshToken:string):Promise<{accessToken:string, refreshToken:string}>{
+
+      // verify first the refresh token
+      const payload= tokenService.verifyRefreshToken(refreshToken)
+      const user=await User.findById(payload.userId).select("+refreshToken")
+      if(!user || user.refreshToken !==refreshToken){
+        throw new UnauthorizedError('Invalid refresh token')
+      }
+
+      // is active
+      if(!user.isActive){
+        throw new UnauthorizedError("Your account has ben deactivated, Please contact support.")
+      }
+
+      // generating new access token
+      const newPayload:TokenPayload={
+        email:user.email,
+        userId:user._id.toString(),
+        role:user.role
+      }
+      const tokens=tokenService.generateTokenPair(newPayload)
+      user.refreshToken=tokens?.refreshToken
+      await user.save()
+      return tokens
+
+    }
+
     private async checkUserExists(email:string):Promise<void>{
       const existingUser=await User.findOne({email})
       if(existingUser){

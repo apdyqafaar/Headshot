@@ -1,6 +1,6 @@
 import { config } from "@/config"
 import { authService } from "@/services"
-import { validationErrors } from "@/util/errors"
+import { UnauthorizedError, validationErrors } from "@/util/errors"
 import { createdResponse, successResponse } from "@/util/response"
 import type { Request, Response } from "express"
 
@@ -83,4 +83,42 @@ export const login=async(req:Request, res:Response)=>{
     }
   }, "Login successful")
   
+}
+
+// get current user or `/me` route
+export const getCurrentUser=async(req:Request, res:Response)=>{
+      const user=await authService.getCurrentUser(req?.user?.userId as string)
+
+      return successResponse(res, {
+        user:{
+          id:user?._id,
+          email:user?.email,
+          name:user?.name,
+        }
+      }, "User fetched successfully")
+}
+
+// refresh token
+export const refreshToken=async(req:Request, res:Response)=>{
+    const token=req.cookies?.refreshToken || req.body.refreshToken
+
+    if(!token){
+      throw new UnauthorizedError("Refresh token is required")
+    }
+
+    // refresh token service
+    const tokens=await authService.refreshAccessToken(token)
+
+    res.cookie("accessToken", tokens.accessToken,{
+      ...cookieOptions,
+      maxAge:15 * 60 * 1000, // 15 minutes
+    })
+
+
+    res.cookie("refreshToken", tokens.refreshToken,{
+      ...cookieOptions,
+      maxAge:15 * 60 * 1000, // 7 days
+    })
+
+    return successResponse(res, "*", "Token refreshed successfully")
 }
