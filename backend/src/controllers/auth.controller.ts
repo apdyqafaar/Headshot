@@ -90,11 +90,9 @@ export const getCurrentUser=async(req:Request, res:Response)=>{
       const user=await authService.getCurrentUser(req?.user?.userId as string)
 
       return successResponse(res, {
-        user:{
           id:user?._id,
           email:user?.email,
           name:user?.name,
-        }
       }, "User fetched successfully")
 }
 
@@ -117,7 +115,7 @@ export const refreshToken=async(req:Request, res:Response)=>{
 
     res.cookie("refreshToken", tokens.refreshToken,{
       ...cookieOptions,
-      maxAge:15 * 60 * 1000, // 7 days
+      maxAge:7 *24 *60 *60 *1000, // 7 days
     })
 
     return successResponse(res, "*", "Token refreshed successfully")

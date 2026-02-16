@@ -1,5 +1,5 @@
 import { api } from "../api";
-import { LoginInput, loginResponse, RegisterInput, RegisterResponse, veryEmailResponse } from "../types";
+import { LoginInput, loginResponse, RegisterInput, RegisterResponse, User, veryEmailResponse } from "../types";
 
 export const authService={
 
@@ -21,5 +21,11 @@ export const authService={
     // login
     login: async(data:LoginInput):Promise<loginResponse>=>{
     return await api.post<loginResponse>("/auth/login", data)
+    },
+
+    // get current user
+    getCUrrentUser: async():Promise<User>=>{
+    return await api.get<User>("/auth/me")
     }
+
 }

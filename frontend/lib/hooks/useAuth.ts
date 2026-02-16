@@ -1,9 +1,10 @@
-import { useMutation } from "@tanstack/react-query"
+import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { LoginInput, RegisterInput } from "../types"
 import { authService } from "../services/auth.service"
 
-export const authkeys={
+export const authKeys={
   all:["auth"] as const,
+  currentUser:()=>[...authKeys.all, "currentUser"] as const 
 }
 
 
@@ -31,7 +32,26 @@ export const useResendVerification=()=>{
 
 
 export const useLogin=()=>{
+    const queryClient= useQueryClient()
     return useMutation({
-        mutationFn:(data:LoginInput)=> authService.login(data)
+        mutationFn:(data:LoginInput)=> authService.login(data),
+        onSuccess:()=>{
+            queryClient.invalidateQueries({queryKey:authKeys.currentUser()})
+        }
+    })
+}
+
+export const useCUrrentUser=(options?:{redirectOnError?:boolean})=>{
+    return useQuery({
+        queryKey:authKeys.all,
+        queryFn:()=> authService.getCUrrentUser(),
+        staleTime:5 * 60 *1000, // 5minutes
+        retry:false,
+        throwOnError:(error)=> {
+            if(options?.redirectOnError && typeof window !== "undefined"){
+                window.location.href="/login"
+            }
+            return false
+        },
     })
 }
