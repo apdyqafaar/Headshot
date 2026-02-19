@@ -55,3 +55,9 @@ export const useCUrrentUser=(options?:{redirectOnError?:boolean})=>{
         },
     })
 }
+
+export const useLogout=()=>{
+    return useMutation({
+        mutationFn:()=>authService.logout()
+    })
+}

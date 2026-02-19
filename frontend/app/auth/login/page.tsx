@@ -12,8 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useCUrrentUser, useLogin } from "@/lib/hooks/useAuth"
+import { Form, FormControl,  FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import {  useCUrrentUser, useLogin } from "@/lib/hooks/useAuth"
 import {Loader2} from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -62,7 +62,9 @@ const loginPage = () => {
     }
 
     // GET CURRENT USER
-    // const {data:currentUser, error}=useCUrrentUser()
+    const {data:currentUser, error}=useCUrrentUser()
+    if(currentUser) router.push("/dashboard")
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 ">
       <div className="w-full max-w-md space-y-8 bg-card ">

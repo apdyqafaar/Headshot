@@ -93,13 +93,14 @@ export const getCurrentUser=async(req:Request, res:Response)=>{
           id:user?._id,
           email:user?.email,
           name:user?.name,
+          role:user?.role
       }, "User fetched successfully")
 }
 
 // refresh token
 export const refreshToken=async(req:Request, res:Response)=>{
     const token=req.cookies?.refreshToken || req.body.refreshToken
-
+       console.log(token)
     if(!token){
       throw new UnauthorizedError("Refresh token is required")
     }
@@ -119,4 +120,24 @@ export const refreshToken=async(req:Request, res:Response)=>{
     })
 
     return successResponse(res, "*", "Token refreshed successfully")
+}
+
+// Logout
+export const logout=async(req:Request, res:Response)=>{
+  // user can logout on mobile
+  let token=req.cookies?.accessToken
+  if(!token){
+    const authHeaders=req.headers.authorization
+    if(authHeaders?.startsWith("Bearer ")){
+      token=authHeaders.substring(7)
+    }
+  }
+
+  if(token){
+    const user=await authService.logout(req.user?.userId as string) 
+  }
+    res.clearCookie("accessToken", cookieOptions)
+    res.clearCookie("refreshToken", cookieOptions)
+  
+    return successResponse(res,{message:"User logged out successfully"}, "User logged out successfully")
 }

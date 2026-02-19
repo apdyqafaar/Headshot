@@ -155,6 +155,12 @@ export class AuthService{
 
     }
 
+    // logout
+    async logout(userId:string):Promise<void>{
+      // clear the refresh token
+      await User.findByIdAndUpdate(userId,{refreshToken:null})
+    }
+
     // get current user service
     async getCurrentUser(userId:string):Promise<IUser>{
       const user=await User.findById(userId)

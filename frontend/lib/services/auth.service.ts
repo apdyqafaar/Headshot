@@ -23,6 +23,11 @@ export const authService={
     return await api.post<loginResponse>("/auth/login", data)
     },
 
+    // logout
+    logout:async():Promise<void>=>{
+      return api.post<void>("/auth/logout")
+    },
+
     // get current user
     getCUrrentUser: async():Promise<User>=>{
     return await api.get<User>("/auth/me")

@@ -21,4 +21,7 @@ authRoute.get("/me", authenticate, authController.getCurrentUser)
 // refresh token
 authRoute.post("/refresh-token",  authController.refreshToken)
 
+// logout
+authRoute.post("/logout", authenticate, authController.logout)
+
 export default authRoute
