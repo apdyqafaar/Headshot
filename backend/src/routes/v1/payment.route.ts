@@ -1,11 +1,11 @@
+import { paymentController } from "@/controllers";
+import { authenticate } from "@/middleware";
 import { Router } from "express";
 
 const router=Router()
 
-router.get("/webhook", (req, res)=>{
-  res.json({
-    message:"received web hook"
-  })
-})
-
+// public routes
+router.get("/packages", paymentController.getCreditPackages)
+router.use(authenticate)
+router.post("/process", paymentController.processPayment)
 export default router
