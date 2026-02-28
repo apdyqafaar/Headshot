@@ -37,6 +37,16 @@ export interface ProcessPaymentParams{
   cancelUrl?:string
 }
 
+export interface PaymentHistoryProps{
+    orders:Order[]
+    isLoading:boolean
+}
+export interface CreditPackacgeCardProps{
+  package:CreditPackage;
+  onSelect:(packageId:string)=>void;
+  isLoading?:boolean;
+  isSelected?:boolean;
+}
 
 
 export interface Order   {
