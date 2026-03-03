@@ -52,13 +52,11 @@ const loginPage = () => {
           router.push("/")
         },
         onError:(err: any)=>{
-          // console.log("err", err?.response)
           toast.error('Login account failed',{
-            description:err?.response.data?.message||err?.message ||"Unable to login account, Please try again"
+            description:err?.response?.data?.message || err?.message  ||"Unable to login account, Please try again"
           })
         }
      })
-
     }
 
     // GET CURRENT USER

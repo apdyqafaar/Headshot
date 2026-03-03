@@ -45,7 +45,7 @@ interface LocalPaymentFormProps{
    isLoading:boolean,
    onSubmit:(selectedMethod:string, phone:string)=>void
 }
-const localPaymentForm = ({isLoading=false,onSubmit,packageId}:LocalPaymentFormProps) => {
+const LocalPaymentForm = ({isLoading=false,onSubmit,packageId}:LocalPaymentFormProps) => {
     const [phone, setPhone]=useState<string>("")
     const [selectedMethod, setSelectedMethod]=useState<string>("EVC")
 
@@ -66,14 +66,14 @@ const localPaymentForm = ({isLoading=false,onSubmit,packageId}:LocalPaymentFormP
                 {/* Payment Method Selection */}
                 <div className="mb-6 space-y-2">
                     <Label>Payment Method</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-4">
                         {
                             PAYMENT_METHODS.map(method=>{
                                 const Icon=method.icon
                                 return(
                                     <Button type="button" variant={"outline"} key={method.id} onClick={()=>setSelectedMethod(method.id)}
                                      disabled={isLoading}
-                                     className={`flex items-center gap-4 p-4 rounded-lg border-2 transition-all
+                                     className={`flex items-center gap-4 p-4 py-6 rounded-lg border-2 transition-all
                                         ${selectedMethod===method.id
                                             ?"border-primary bg-primary/10"
                                             :"border-border hover:border-primary/30"
@@ -112,7 +112,7 @@ const localPaymentForm = ({isLoading=false,onSubmit,packageId}:LocalPaymentFormP
                 {/* phone */}
                 <div className="space-y-4">
 
-                    <div>
+                    <div className="space-y-2">
                         <Label htmlFor="phone">Phone Number</Label>
                         <Input
                          id="Phone"
@@ -185,4 +185,4 @@ const localPaymentForm = ({isLoading=false,onSubmit,packageId}:LocalPaymentFormP
     )
 }
 
-export default localPaymentForm
+export default LocalPaymentForm

@@ -34,6 +34,7 @@ export const useResendVerification=()=>{
 export const useLogin=()=>{
     const queryClient= useQueryClient()
     return useMutation({
+        retry:false,
         mutationFn:(data:LoginInput)=> authService.login(data),
         onSuccess:()=>{
             queryClient.invalidateQueries({queryKey:authKeys.currentUser()})
@@ -49,7 +50,7 @@ export const useCUrrentUser=(options?:{redirectOnError?:boolean})=>{
         retry:false,
         throwOnError:(error)=> {
             if(options?.redirectOnError && typeof window !== "undefined"){
-                window.location.href="/login"
+                window.location.href="/auth/login"
             }
             return false
         },

@@ -40,7 +40,7 @@ const ResendVerificationPage = () => {
                      description:"Please check your email for the verification link"
                 })
                 form.reset()
-                router.push("/login")
+                router.push("/auth/login")
             },
             onError:(err :any)=>{
                 toast.error("Failed to send verification email", {

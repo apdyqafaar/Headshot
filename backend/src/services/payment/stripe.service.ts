@@ -41,7 +41,7 @@ export class StripeService{
                         currency:"usd",
                         product_data:{
                             name:`${credits} Headshot credits`,
-                            descriPtion:`Purchased ${credits} for ${amount}`
+                            description:`Purchased ${credits} for ${amount}`
                         },
                         unit_amount:Math.round(amount * 100)
                     },

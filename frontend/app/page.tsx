@@ -14,7 +14,7 @@ export default function Home() {
     (
       !currentUser?(
        <Button variant={"link"}>
-          <Link href={"/login"}>
+          <Link href={"/auth/login"}>
          login
         </Link>
        </Button>

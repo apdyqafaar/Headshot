@@ -35,7 +35,7 @@ const StripeCheckoutSection = ({isLoading, onCheckout,package:pkg}:StripeCheckou
             {
                 isLoading?(
                     <>
-                    <Loader2 className="w-4 h-4"/> 
+                    <Loader2 className="w-4 h-4 animate-spin"/> 
                     Processing
                     </>
                 ):(

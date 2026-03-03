@@ -74,7 +74,7 @@ axiosInstance.interceptors.response.use(
     
     const isRefreshingEndPOint=originalRequest?.url?.includes("/auth/refresh-token")
     if(isRefreshingEndPOint || originalRequest._retry || hasRefreshFailedKey()){
-        return Promise.reject()
+        return Promise.reject(err)
     }
      
         originalRequest._retry=true

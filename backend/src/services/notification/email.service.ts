@@ -135,7 +135,7 @@ export class EmailService{
 
 
     async sendVerificationEmail(email:string, name:string|undefined, token:string):Promise<void>{
-        const verificationUrl=`${config.frontendUrl}/verify-email?token=${token}`
+        const verificationUrl=`${config.frontendUrl}/auth/verify-email?token=${token}`
         await this.senderEmail(email, "Verify Your Email Address", "verification", {
             name:name||"",
             verificationUrl

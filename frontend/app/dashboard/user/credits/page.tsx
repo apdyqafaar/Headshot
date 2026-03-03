@@ -2,6 +2,7 @@
 
 import CreditPackageCard from "@/components/payments/credit-packacge-card";
 import CreditsHeader from "@/components/payments/credits-header";
+import LocalPaymentForm from "@/components/payments/local-payment-form";
 import PaymentHistory from "@/components/payments/payment-history";
 import SelectPaymentSelector from "@/components/payments/payment-method-selector";
 import StripeCheckoutSection from "@/components/payments/stripe-checkout-section";
@@ -12,7 +13,6 @@ import {
   useGetCreditPackages,
   useProcessPayment,
 } from "@/lib/hooks/usePayment";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 const creditsPage = () => {
@@ -61,7 +61,19 @@ const creditsPage = () => {
     console.log("sessionId ", sessionId);
   };
 
-const handleProcessPayment=()=>{
+
+  // stipe job 
+const handleProcessStripePayment=()=>{
+  if(!selectedPackageId) return
+  const frontEndUrl=window.location.origin
+  processPayment({
+    packageId:selectedPackageId,
+    platform:PaymentPlatform.STRIPE,
+    cancelUrl:`${frontEndUrl}/dashboard/user/credits?status=cancelled`,
+    successUrl:`${frontEndUrl}/dashboard/user/credits`
+  })
+}
+const handleProcessLocalPayment=()=>{
   
 }
   return (
@@ -117,7 +129,13 @@ const handleProcessPayment=()=>{
                  <div className="border-t pt-6">
                   {
                     selectedPlatform===PaymentPlatform.STRIPE && selectedPackage&&(
-                      <StripeCheckoutSection isLoading={isProcessing} onCheckout={handleProcessPayment} package={selectedPackage}/>
+                      <StripeCheckoutSection isLoading={isVerifying} onCheckout={handleProcessStripePayment} package={selectedPackage}/>
+                    )
+                  }
+
+                  {
+                   showLocalForm && selectedPackage&&(
+                      <LocalPaymentForm packageId={selectedPackage._id} isLoading={isProcessing} onSubmit={handleProcessLocalPayment}/>
                     )
                   }
                  </div>

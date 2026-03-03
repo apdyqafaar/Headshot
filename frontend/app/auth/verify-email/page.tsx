@@ -26,7 +26,7 @@ function VerifyEMailContent ()  {
                     description:"Your Email has been verified successfully. Redirecting to login..."
                 })
 
-                setTimeout(()=> router.push("/login"), 2000)
+                setTimeout(()=> router.push("/auth/login"), 2000)
             },
             onError:(error:any)=>{
                 console.log(error.response?.data)
@@ -162,7 +162,7 @@ function VerifyEMailContent ()  {
 
 
                             <div className=" w-full">
-                                <Link href={"/login"}>
+                                <Link href={"/auth/login"}>
                                 <Button className="w-full">Continue to login</Button>
                                 </Link>
                                 

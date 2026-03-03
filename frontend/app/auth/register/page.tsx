@@ -55,12 +55,12 @@ const registerPage = () => {
           toast.success('User registered successfully',{
             description:"Please check your email to verify your account before logging in"
           })
-          router.push("/login")
+          router.push("/auth/login")
         },
         onError:(err: any)=>{
           // console.log("err", err?.response)
           toast.error('Registration failed',{
-            description:err?.response.data?.message||err?.message ||"Unable to create account, Please try again"
+            description:err?.response?.data?.message || err?.message   ||"Unable to create account, Please try again"
           })
         }
      })
@@ -165,7 +165,7 @@ const registerPage = () => {
 
         <div className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href={"/login"} className="font-medium text-foreground hover:underline">
+          <Link href={"/auth/login"} className="font-medium text-foreground hover:underline">
           Sign in
           </Link>
         </div>
