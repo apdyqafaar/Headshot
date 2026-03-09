@@ -1,0 +1,11 @@
+Payment Successful
+   {{name}}
+
+Your order #{{orderId}} has been processed successfully.
+Amount charged: ${{amoun}}
+Your new balance is ${{newBalance}}
+
+You can view/manage your credits on your dashboard:
+  {{dashboardUrl}}
+
+Thank you for using Headshot Generator!

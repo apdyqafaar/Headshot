@@ -3,6 +3,7 @@ import { PaymentPlatform, PaymentResponse, PaymentStatus } from "@/types/payment
 import { appError, NotFoundError } from "@/util/errors";
 import { loger } from "@/util/logger";
 import { stripeService } from "./stripe.service";
+import { triggerCreditAddition } from "../queue/queue.service";
 
 export class PaymentService{
     // TODO: implement payment service
@@ -99,6 +100,7 @@ async processStripePayment(params:{
         orderId:order._id.toString(),
         sessionId:stripeSession.sessionId,
         redirectUrl:stripeSession.redirectUrl,
+        // redirectUrl:`${config.frontendUrl}/verify-payment?session_id=${stripeSession.redirectUrl}`,
         amount:order.amount,
         credits:totalCredits,
         status:PaymentStatus.PROCESSING
@@ -197,6 +199,37 @@ async processPayment(params:{
     throw new appError("Failed to process payment")
    }
 }
+
+// process payment if success
+   async handlePaymentSuccess(orderId:string, source:"STRIPE"|"LOCAL"|"ADMIN"="STRIPE"):Promise<void>{
+
+    try {
+        const order=await Order.findById(orderId)
+       if(!order){
+        loger.warn("Order not found",orderId)
+        throw new appError("Order not found", 404)
+       }
+
+       if(order.creditsAdded){
+          loger.warn("Credits already added for order", orderId)
+          throw new appError("Credits already added for order")
+       }
+
+    //  : Integrating Inngest Queue for the payment
+             await triggerCreditAddition({
+                credits:order.credits as number,
+                userId:order.user.toString(),
+                orderId:order._id.toString(),
+                source,
+             })
+             loger.info(`Credits addition triggred for order ${order._id} with ${order.credits} credits from ${source}`)
+    } catch (error) {
+        loger.info(`Credits addition triggred for order `, error)
+    }
+
+       
+
+   }
 }
 
 export const paymentService=new PaymentService()

@@ -46,7 +46,8 @@ export interface PaymentResponse{
   amount?:number;
   credits?:number;
   redirectUrl?:string;
-  status?:PaymentStatus
+  status?:PaymentStatus,
+  cancelUrl?:string
 }
 
 export interface PaymentResult{

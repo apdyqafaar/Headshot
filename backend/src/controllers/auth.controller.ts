@@ -93,7 +93,8 @@ export const getCurrentUser=async(req:Request, res:Response)=>{
           id:user?._id,
           email:user?.email,
           name:user?.name,
-          role:user?.role
+          role:user?.role,
+          credits:user?.credits
       }, "User fetched successfully")
 }
 

@@ -57,9 +57,7 @@ const creditsPage = () => {
   const selectedPackage = packages?.find(
     (pcg) => pcg._id === selectedPackageId,
   );
-  const handleVerifyingPayment = (sessionId: string) => {
-    console.log("sessionId ", sessionId);
-  };
+
 
 
   // stipe job 
@@ -70,7 +68,7 @@ const handleProcessStripePayment=()=>{
     packageId:selectedPackageId,
     platform:PaymentPlatform.STRIPE,
     cancelUrl:`${frontEndUrl}/dashboard/user/credits?status=cancelled`,
-    successUrl:`${frontEndUrl}/dashboard/user/credits`
+    successUrl:`${frontEndUrl}/verify-payment`
   })
 }
 const handleProcessLocalPayment=()=>{
@@ -78,10 +76,6 @@ const handleProcessLocalPayment=()=>{
 }
   return (
     <div className="space-y-8">
-      <StripeRedirectHandler
-        onVerify={handleVerifyingPayment}
-        isVerifying={isVerifying}
-      />
       <CreditsHeader
         credits={user?.credits as number}
         onToggleHistory={() => setShowHistory(!showHistory)}

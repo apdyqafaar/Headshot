@@ -5,6 +5,7 @@ interface CreditBalanceProps{
 }
 
 export const CreditBalance = ({credits}:CreditBalanceProps) => {
+  
   return (
     <div className="px-4 py-2 rounded-lg border border-border bg-card">
         <div className="flex items-center gap-2">

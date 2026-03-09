@@ -61,7 +61,9 @@ const loginPage = () => {
 
     // GET CURRENT USER
     const {data:currentUser, error}=useCUrrentUser()
-    if(currentUser) router.push("/dashboard")
+    if(currentUser){
+      return router.push("/dashboard")
+    }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 ">

@@ -1,5 +1,6 @@
 import { paymentService } from "@/services/payment"
-import { NotFoundError } from "@/util/errors"
+import { stripeService } from "@/services/payment/stripe.service"
+import { appError, NotFoundError } from "@/util/errors"
 import { successResponse } from "@/util/response"
 import { Request, Response } from "express"
 
@@ -16,4 +17,14 @@ export const processPayment=async(req:Request, res:Response)=>{
     }
   const paymentResponse=await paymentService.processPayment({cancelUrl,userId ,packageId,platform,successUrl,phone})
   return successResponse(res, paymentResponse,"Payment processed successfully")
+}
+
+export const handleStripeWebhook=async(req:Request, res:Response)=>{
+ 
+  const stripeSignature=req.headers["stripe-signature"] 
+  if(!stripeSignature){
+     throw new appError("Stripe signature is required", 400)
+  }
+
+  await stripeService.handleStripeWebhook(req.body, stripeSignature as string)
 }

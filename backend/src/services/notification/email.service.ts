@@ -141,6 +141,21 @@ export class EmailService{
             verificationUrl
         })
     }
+
+    async sendPaymentSuccessEmail(email:string, name:string|undefined, orderId:string, amount:number, credits:number, newBalance:number):Promise<void>{
+        const dashboardUrl=`${config.frontendUrl}/dashboard/user/credits`
+        await this.senderEmail(email,'Payment Successful - Credits added',
+            'payment-success',
+            {
+                name:name||"there",
+                orderId,
+                amoun:amount.toFixed(2),
+                newBalance,
+                dashboardUrl
+            }
+        )
+
+    }
 }
 
 
