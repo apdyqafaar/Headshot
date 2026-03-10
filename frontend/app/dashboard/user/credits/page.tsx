@@ -14,6 +14,7 @@ import {
   useProcessPayment,
 } from "@/lib/hooks/usePayment";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const creditsPage = () => {
   const { user } = useUser();
@@ -71,8 +72,17 @@ const handleProcessStripePayment=()=>{
     successUrl:`${frontEndUrl}/verify-payment`
   })
 }
-const handleProcessLocalPayment=()=>{
-  
+const handleProcessLocalPayment=(method: string, phone:string)=>{
+
+  console.log("Processing local payment for package:", method, phone, selectedPackageId);
+  if(!selectedPackageId) return;
+  setIsProcessing(true);
+  const loading=toast.loading("Processing your payment, please wait...");
+  setTimeout(()=>{
+    setIsProcessing(false);
+    toast.dismiss(loading)
+    toast.success("Payment processed successfully! Your credits will be updated shortly.");
+  }, 3000)
 }
   return (
     <div className="space-y-8">

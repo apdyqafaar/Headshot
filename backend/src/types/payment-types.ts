@@ -73,11 +73,12 @@ export interface MobileWalletConfig{
 
 export interface MobileWalletPayload {
   schemaVersion?: string;
-  requestedId?: string;
+  requestId?: string;
   timestamp?: string;
   channelName?: string;
   serviceName?: string;
   serviceParams?: {
+    paymentMethod:string;
     merchantUid: string;
     apiKey: string;
     apiUserId: string;

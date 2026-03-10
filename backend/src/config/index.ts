@@ -38,5 +38,20 @@ export const config={
    stripe:{
       secretKey:process.env.STRIPE_SECRET_KEY,
       webHook:process.env.STRIPE_WEBHOOK_SECRET
+   },
+
+   // mobile wallet somalia
+   mobileWallet:{
+      merchantUid:process.env.MERCHANT_U_ID ||"",
+      apiKey:process.env.MERCHANT_API_KEY ||"",
+      apiUserId:process.env.MERCHANT_API_USER_ID ||"",
+      apiEndpoint:process.env.MERCHANT_API_END_POINT ||""
+   },
+   // mobile wallet eBIRR
+   ebirr:{
+      merchantUid:process.env.EBIRR_MERCHANT_U_ID ||"",
+      apiKey:process.env.EBIRR_MERCHANT_API_KEY ||"",
+      apiUserId:process.env.EBIRR_MERCHANT_API_USER_ID ||"",
+      apiEndpoint:process.env.EBIRR_MERCHANT_API_END_POINT ||""
    }
 }

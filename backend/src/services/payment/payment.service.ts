@@ -1,9 +1,11 @@
 import { CreditsPackage, ICreditPackage, IOrder, Order, User } from "@/models";
-import { PaymentPlatform, PaymentResponse, PaymentStatus } from "@/types/payment-types";
+import { MobileWalletPayload, MobileWalletResponse, PaymentPlatform, PaymentResponse, PaymentStatus } from "@/types/payment-types";
 import { appError, NotFoundError } from "@/util/errors";
 import { loger } from "@/util/logger";
 import { stripeService } from "./stripe.service";
 import { triggerCreditAddition } from "../queue/queue.service";
+import { config } from "@/config";
+import axios from "axios";
 
 export class PaymentService{
     // TODO: implement payment service
@@ -124,6 +126,139 @@ async processStripePayment(params:{
     
 }
 
+// process mobile wallet payment (SAHAL, EVC, ZAAD)
+async processMobileWalletPayment(params:{
+    order:IOrder,
+    platform:PaymentPlatform,
+    phone:string
+}):Promise<PaymentResponse>{
+   
+    const {order,phone,platform}=params
+   
+    try {
+    
+      if(!phone){
+        throw new appError("Phone number is required", 400)
+      }
+      loger.info(`Processing mobile wallet payment for order ${order._id.toString()} on platform ${platform} with phone ${phone}`)
+      const config=this.getMobileWalletConfig(platform)
+      if(!config.apiEndpoint || !config.apiKey || !config.apiUserId  || !config.merchantUid ){
+        loger.warn(`Mobile wallet config is not valid for platform ${platform}`)
+        throw new appError("Mobile wallet config is not valid", 400)
+      }
+
+    //   preparing the payload
+      const payload:MobileWalletPayload={
+        schemaVersion:"1.0",
+        requestId:order._id.toString()+"-"+Date.now(),
+        timestamp:new Date().toISOString(),
+        channelName:"WEB",
+        serviceName:"API_PURCHASE",
+        serviceParams:{
+            merchantUid:config.merchantUid,
+            apiKey:config.apiKey,
+            apiUserId:config.apiUserId,
+            paymentMethod:"MWALLET_ACCOUNT",
+            payerInfo:{
+                accountNo:phone
+            },
+            transactionInfo:{ 
+                   platform,
+                 amount:order.amount,
+                 currency:"USD",
+                 description:`Headshot Pro - Purchase of ${order.credits} credits`,
+                 invoiceId:order._id.toString(),
+                referenceId:order._id.toString(),
+            }
+
+        }
+
+       }
+       loger.info(`sending mobile wallet payment request for order ${order._id.toString()} with payload`, payload)
+       const response=await axios.post<MobileWalletResponse>(config.apiEndpoint, payload,{
+        headers:{
+            "Content-Type":"application/json"
+        }
+       })
+         loger.info(`Received response from mobile wallet payment request for order ${order._id.toString()} on platform ${platform}`, response.data)
+         return await this.handleMobileWalletResponse(response.data, order, platform)
+
+    } catch (error) {
+        loger.error(`Error processing mobile wallet payment for order ${order._id.toString()} on platform ${platform}`, error)
+        throw new appError("Failed to process mobile wallet payment", 500)
+    }
+}
+// get mobile config
+getMobileWalletConfig(platform:PaymentPlatform):{
+    merchantUid:string,
+    apiKey:string,
+    apiUserId:string,
+    apiEndpoint:string
+}{
+
+    switch(platform){
+        case PaymentPlatform.EBIRR:
+            return{
+                merchantUid:config.ebirr.merchantUid,
+                apiKey:config.ebirr.apiKey,
+                apiUserId:config.ebirr.apiUserId,
+                apiEndpoint:config.ebirr.apiEndpoint,
+            }
+        default:
+             return{
+                merchantUid:config.mobileWallet.merchantUid,
+                apiKey:config.mobileWallet.apiKey,
+                apiUserId:config.mobileWallet.apiUserId,
+                apiEndpoint:config.mobileWallet.apiEndpoint,
+            }
+    }
+}
+
+// handle mobile wallet response
+async handleMobileWalletResponse(response:MobileWalletResponse, order:IOrder, platform:PaymentPlatform):Promise<PaymentResponse>{
+ try {
+     const isSuccess=response.responseCode==="2001" ||response.referenceId==="RCS_SUCCESS"
+  if(isSuccess){
+    order.status===PaymentStatus.PROCESSING,
+    order.transactionId=response.transactionId ||response.referenceId;
+    await order.save()
+    // Que credit addition
+    await this.handlePaymentSuccess(order._id.toString(), "LOCAL")
+    loger.info(`Mobile wallet payment processed successfully for order ${order._id.toString()} on platform ${platform}`)
+
+    return {
+        success:true,
+        message:'Mobile wallet payment processed successfully',
+        orderId:order._id.toString(),
+        transactionId:order.transactionId ,
+        amount:order.amount,
+        credits:order.credits,
+        status:PaymentStatus.COMPLETED
+    }
+  }else{
+    order.status=PaymentStatus.FAILED
+    await order.save()
+    loger.warn(`Mobile wallet payment failed for order ${order._id.toString()} on platform ${platform} with response`, response)
+    return{
+        success:false,
+        message:'Mobile wallet payment failed',
+        orderId:order._id.toString(),
+        amount:order.amount,
+        credits:order.credits,
+        status:PaymentStatus.FAILED,
+        error:{
+            code:response.responseCode,
+            message:response.responseMSG,
+            fullResponse:response
+        }
+    }
+  }
+ } catch (error) {
+   loger.info(`Error handling mobile wallet response for order ${order._id.toString()} on platform ${platform}`, )
+    throw new appError("Failed to handle mobile wallet response", 500)
+ }
+}
+
 // process payment
 async processPayment(params:{
     userId:string,
@@ -182,14 +317,14 @@ async processPayment(params:{
         credits:totalCredits
       }
     }else if(platform===PaymentPlatform.EVC ||platform===PaymentPlatform.ZAAD ||platform===PaymentPlatform.SAHAL){
-         return{
-        success:true,
-        message:'payment session created',
-        orderId:"",
-        redirectUrl:"",
-        amount:order.amount,
-        credits:totalCredits
-      }
+        if(!phone){
+            throw new appError("Phone number is required for mobile wallet payment", 400)
+        }
+         return await this.processMobileWalletPayment({
+            order,
+            platform,
+            phone:phone as string
+         })
     }else {
         throw new appError("unsupported  platform", 400)
     }
