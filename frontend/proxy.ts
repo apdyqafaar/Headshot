@@ -11,6 +11,8 @@ export async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken");
   const refreshToken = request.cookies.get("refreshToken");
 
+  const response = NextResponse.next();
+
   // is user authenticated
   const isAuthenticated = !!(accessToken?.value || refreshToken?.value);
 
@@ -44,12 +46,17 @@ export async function proxy(request: NextRequest) {
             },
           },
         );
-
+        const data=await refreshTokenResponse.json()
+        if(data.success ===false){
+          response.cookies.delete("accessToken")
+           response.cookies.delete("refreshToken")
+        }
+        console.log("refereshT", data)
         if (refreshTokenResponse.ok) {
           const setCookie = refreshTokenResponse.headers.get("set-cookie");
-
+           
           if (setCookie) {
-            const response = NextResponse.next();
+          
 
             setCookie.split(",").forEach((cookie) => {
               const [nameValue] = cookie.trim().split(";");

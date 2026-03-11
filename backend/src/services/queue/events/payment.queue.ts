@@ -4,7 +4,6 @@ import { emailService } from "@/services/notification/email.service"
 import { PaymentStatus } from "@/types/payment-types"
 import { loger } from "@/util/logger"
 import { NonRetriableError } from "inngest"
-import { formatDiagnostic } from "typescript"
 
 export interface ICreditAdditionData{
      userId:string,

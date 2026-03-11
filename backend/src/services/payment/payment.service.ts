@@ -126,6 +126,59 @@ async processStripePayment(params:{
     
 }
 
+// process ebirr mobile wallet payment
+async processEbirrMobileWalletPayment(params:{order:IOrder, phone:string, platform:PaymentPlatform}):Promise<PaymentResponse>{
+  const {order,phone,platform}=params
+  if(!phone){
+        throw new appError("Phone number is required", 400)
+  }
+   loger.info(`Processing mobile wallet payment for order ${order._id.toString()} on platform ${platform} with phone ${phone}`)
+   const config=this.getMobileWalletConfig(platform)
+   if(!config.apiEndpoint|| !config.apiUserId|| !config.merchantUid|| !config.apiKey){
+    loger.warn(`Mobile wallet config is not valid ${platform}`)
+    throw new appError('Mobile wallet config is not valid', 400)
+   }
+    const payload:MobileWalletPayload={
+        schemaVersion:"1.0",
+        requestId:order._id.toString()+"-"+Date.now(),
+        timestamp:new Date().toISOString(),
+        channelName:"WEB",
+        serviceName:"API_PURCHASE",
+        serviceParams:{
+            merchantUid:config.merchantUid,
+            apiKey:config.apiKey,
+            apiUserId:config.apiUserId,
+            paymentMethod:"MWALLET_ACCOUNT",
+            payerInfo:{
+                accountNo:phone
+            },
+            transactionInfo:{ 
+                   platform,
+                 amount:order.amount,
+                 currency:"USD",
+                 description:`Headshot Pro - Purchase of ${order.credits} credits`,
+                 invoiceId:order._id.toString(),
+                referenceId:order._id.toString(),
+            }
+
+        }
+
+       }
+
+    //    sending request to ebirr server
+    const response=await axios.post<MobileWalletResponse>(config.apiEndpoint, payload, {
+        headers:{
+            "Content-Type":"application/json"
+        }
+    })
+
+    loger.info(`Received response from ebirr server mobile wallet payment order: ${order._id.toString()} platform: ${platform} ${response.data}`)
+    
+    // process the response
+   return await this.handleMobileWalletResponse(response.data, order, platform)
+
+}
+
 // process mobile wallet payment (SAHAL, EVC, ZAAD)
 async processMobileWalletPayment(params:{
     order:IOrder,
@@ -308,14 +361,11 @@ async processPayment(params:{
         credits:totalCredits
       }
     }else if(platform===PaymentPlatform.EBIRR){
-  return{
-        success:true,
-        message:'payment session created',
-        orderId:undefined,
-        redirectUrl:undefined,
-        amount:order.amount,
-        credits:totalCredits
-      }
+  return await this.processEbirrMobileWalletPayment({
+    order,
+    phone:phone as string,
+    platform
+  })
     }else if(platform===PaymentPlatform.EVC ||platform===PaymentPlatform.ZAAD ||platform===PaymentPlatform.SAHAL){
         if(!phone){
             throw new appError("Phone number is required for mobile wallet payment", 400)
@@ -365,6 +415,22 @@ async processPayment(params:{
        
 
    }
+
+//    get payment history
+ async getPaymentHistory(params:{userId:string, limit:number}):Promise<IOrder[]>{
+    const {limit,userId}=params
+    try {
+        const orders=await Order.find({user:userId})
+        .populate("package")
+        .sort({createdAt:-1})
+        .limit(limit)
+
+        return orders
+    } catch (error) {
+        loger.error("Failed to get payment history", error)
+        throw new appError("Failed to get payment history")
+    }
+ }
 }
 
 export const paymentService=new PaymentService()

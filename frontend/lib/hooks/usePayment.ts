@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { getCreditPackage, processPayment } from "../services/payment.service"
+import { getCreditPackage, getPaymentHistory, processPayment } from "../services/payment.service"
 import { ProcessPaymentParams } from "../types"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
@@ -13,6 +13,15 @@ export const useGetCreditPackages=()=>{
         retry:2
     })
 }
+
+export const usePaymentHistory=(limit:number)=>{
+    return useQuery({
+        queryKey:["credit-history", limit],
+        queryFn:()=>getPaymentHistory(limit),
+        staleTime:5 *60*1000,
+        retry:2
+    })
+}  
 
 export const useProcessPayment=()=>{
     const router=useRouter()

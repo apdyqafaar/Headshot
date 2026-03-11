@@ -11,6 +11,7 @@ import { PaymentPlatform } from "@/lib";
 import { useUser } from "@/lib/context";
 import {
   useGetCreditPackages,
+  usePaymentHistory,
   useProcessPayment,
 } from "@/lib/hooks/usePayment";
 import { useState } from "react";
@@ -40,6 +41,7 @@ const creditsPage = () => {
   // process payment
   const { mutate: processPayment, isPending: isVerifying } =
     useProcessPayment();
+    const {data:paymentHistory, isLoading:isLoadingPaymentHistory}=usePaymentHistory(10)
 
   const handleSelected = (packageId: string) => {
     setSelectedPackageId((prev)=>prev===packageId?"":packageId);
@@ -93,7 +95,7 @@ const handleProcessLocalPayment=(method: string, phone:string)=>{
       />
 
       {showHistory ? (
-        <PaymentHistory isLoading={false} orders={[]} />
+        <PaymentHistory isLoading={isLoadingPaymentHistory} orders={paymentHistory || []} />
       ) : (
         isLoadingCredits?(
           <>

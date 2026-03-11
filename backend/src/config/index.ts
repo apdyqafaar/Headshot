@@ -53,5 +53,17 @@ export const config={
       apiKey:process.env.EBIRR_MERCHANT_API_KEY ||"",
       apiUserId:process.env.EBIRR_MERCHANT_API_USER_ID ||"",
       apiEndpoint:process.env.EBIRR_MERCHANT_API_END_POINT ||""
+   },
+
+   // aws
+   aws:{
+      accessKey:process.env.AWS_ACCESS_KEY||"",
+      secretKey:process.env.AWS_SECRET_KEY||"",
+      bucketName:process.env.AWS_BUCKET_NAME||"",
+      region:process.env.AWS_REGION||"",
+      version:process.env.AWS_VERSION||"2010-12-01",
+   },
+   replicate:{
+      apiKey:process.env.REPLICATE_API_KEY
    }
 }

@@ -8,4 +8,5 @@ const router=Router()
 router.get("/packages", paymentController.getCreditPackages)
 router.use(authenticate)
 router.post("/process", paymentController.processPayment)
+router.get("/history",paymentController.getPaymentHistory)
 export default router
