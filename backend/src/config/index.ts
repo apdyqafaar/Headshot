@@ -65,5 +65,11 @@ export const config={
    },
    replicate:{
       apiKey:process.env.REPLICATE_API_KEY
+   },
+
+   upload:{
+      maxFileSize:10 * 1024 * 1024, //100MB
+      allowedImageTypes:["image/jpeg", "image/png", "image/jpg", "image/webp"],
+      maxStyles:5
    }
 }

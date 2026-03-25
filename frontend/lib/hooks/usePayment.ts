@@ -1,3 +1,5 @@
+"use client"
+
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { getCreditPackage, getPaymentHistory, processPayment } from "../services/payment.service"
 import { ProcessPaymentParams } from "../types"

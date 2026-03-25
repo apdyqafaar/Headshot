@@ -2,7 +2,7 @@ import { inngestClient } from "@/routes/inggest.route";
 import { appError } from "@/util/errors";
 import { loger } from "@/util/logger";
 import { Inngest } from "inngest";
-import { getCreditAdditionFunction, ICreditAdditionData } from "./events";
+import { GenerateHeadshotEventData, getCreditAdditionFunction, getGenerateHeadshotFunction, ICreditAdditionData } from "./events";
 
 export const getClient=():Inngest=>{
   return inngestClient
@@ -10,7 +10,8 @@ export const getClient=():Inngest=>{
 
 export function getQueueFunctions(){
     return [
-        getCreditAdditionFunction()
+        getCreditAdditionFunction(),
+        getGenerateHeadshotFunction(),
     ]
 }
 
@@ -24,5 +25,18 @@ export async function triggerCreditAddition(data:ICreditAdditionData):Promise<vo
     } catch (error) {
         loger.warn(`Failed to credit addition for user: ${data.userId}`)
         throw new appError("Failed to credit addition for user", 500)
+    }
+}
+
+// trigger add headshot generation
+export async function triggerHeadshotGeneration(data:GenerateHeadshotEventData):Promise<void>{
+    try {
+        await inngestClient.send({
+            name:"headshot/generate",
+            data
+        })
+    } catch (error) {
+        loger.warn(`Failed to trigger headshot generation: ${data.userId}`)
+        throw new appError("Failed to trigger headshot generation", 500)
     }
 }
