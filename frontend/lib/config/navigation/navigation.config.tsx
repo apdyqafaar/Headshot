@@ -1,5 +1,5 @@
 import { UserRole } from "@/lib/types";
-import { Camera, CreditCard, LayoutDashboard, LucideIcon, Settings, User, Users } from "lucide-react";
+import { Camera, CreditCard, LayoutDashboard, LucideIcon, Settings, ShoppingCart, User, Users } from "lucide-react";
 
 export interface NavigationItem{
  name:string,
@@ -41,29 +41,19 @@ export const userNavigation:NavigationItem[]=[
 export const adminNavigation:NavigationItem[]=[
     {
         name:"Dashboard",
-        href:"/dashboard/user",
+        href:"/dashboard/admin",
         icon:LayoutDashboard
     },
      {
-        name:"Profile",
-        href:"/dashboard/users",
+        name:"Users",
+        href:"/dashboard/admin/users",
         icon:Users
     },
     {
-        name:"Headshots",
-        href:"/dashboard/user/headshots",
-        icon:Camera,
-    },
-     {
-        name:"Credits",
-        href:"/dashboard/user/credits",
-        icon:CreditCard
-    },
-       {
-        name:"Settings",
-        href:"/dashboard/user/settings",
-        icon:Settings
-    },
+        name:"Orders",
+        href:"/dashboard/admin/orders",
+        icon:ShoppingCart,
+    }
 ]
 
 

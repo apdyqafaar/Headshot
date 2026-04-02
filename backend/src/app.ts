@@ -6,11 +6,36 @@ import v1Routes from "./routes/v1"
 import { errorMiddleware } from "./middleware/error.middleware";
 import { errorResponse, successResponse } from "./util/response";
 import { inngestServe } from "./routes/inggest.route";
+import { apiRateLimitConfig } from "./middleware/rateLimit";
+import helmet from "helmet";
+import compression from 'compression'
 
 const app =express();
 
+app.use(helmet({
+    contentSecurityPolicy:{
+        directives:{
+            defaultSrc:["'self'"],
+            styleSrc:["'self'", "'unsafe-inline'"],
+            scriptSrc:["'self'"],
+            imageSrc:["'self'", "data:", "https:"],
+            // connectSrc:[
+            //     "'self'",
+            //     "https://api.stripe.com",
+            //     "https://replicate.com",
+            //     config.env==="development"?"http://localhost:3000":config.frontendUrl
+            // ]
+            fontSrc:["'self'", "data:"],
+            frameSrc:["'self'"],
+            objectSrc:["'none'"],
+            upgradeInsecureRequests:[]
+        },
+    },
+    crossOriginEmbedderPolicy:false,
+    crossOriginResourcePolicy:{policy:"cross-origin"}
+}))
 
-
+app.use(compression())
 // cors and origins
 app.use(cors({
     origin:config.frontendUrl,
@@ -30,14 +55,14 @@ app.use("/api/v1/payment/webhook/stripe", express.raw({ type: "application/json"
 });
 
 // middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({limit:"10mb"}));
+app.use(express.urlencoded({ extended: true, limit:"10mb" }));
 app.use(cookieParser())
 
 
 
 // health check
-app.get("/health", (req, res)=>{
+app.get("/health",apiRateLimitConfig.general, (req, res, next)=>{
     return successResponse(res, { status:"ok",
             message:"server is working healthily...",
             timeStamp:new Date().toISOString()},

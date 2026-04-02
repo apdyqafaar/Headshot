@@ -60,10 +60,10 @@ const loginPage = () => {
     }
 
     // GET CURRENT USER
-    const {data:currentUser, error}=useCUrrentUser()
-    if(currentUser){
-      return router.push("/dashboard")
-    }
+    // const {data:currentUser, error}=useCUrrentUser()
+    // if(currentUser){
+    //   return router.push("/dashboard")
+    // }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 ">
@@ -142,7 +142,7 @@ const loginPage = () => {
 
         <div className="text-center text-sm text-muted-foreground">
           Don 't have an account?{" "}
-          <Link href={"/register"} className="font-medium text-foreground hover:underline">
+          <Link href={"/auth/register"} className="font-medium text-foreground hover:underline">
           Sign Up
           </Link>
         </div>

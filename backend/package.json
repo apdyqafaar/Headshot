@@ -5,11 +5,12 @@
   "private": true,
   "scripts": {
     "dev": "bun --watch src/server.ts",
-    "start": "bun src/server.ts",
-    "build": "tsc --noEmit"
+    "start:prod": "bun dist/server.ts",
+    "build": "tsc && bun build src/server.ts --outdir dist --target=node"
   },
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -25,8 +26,11 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1007.0",
     "@aws-sdk/s3-request-presigner": "^3.1007.0",
+    "@upstash/redis": "^1.37.0",
     "argon2": "^0.44.0",
     "axios": "^1.13.6",
+    "chalk": "^5.6.2",
+    "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
