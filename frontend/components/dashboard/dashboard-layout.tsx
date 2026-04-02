@@ -22,6 +22,7 @@ const DashboardLayout = ({ children, onLogout }: DashboardLayoutProps) => {
 
   const userRole = user?.role;
   const navigationItems=GetNavigationConfig(userRole)
+  console.log(navigationItems)
 
   // handle logout
   const handleLogout=()=>{

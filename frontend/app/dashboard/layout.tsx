@@ -7,7 +7,7 @@ import { redirect } from "next/navigation"
 const dashboardPage = async({children}:{children:React.ReactNode}) => {
    
   const user=await getCurrentUserServer()
-  // console.log("user on layout", user)
+  console.log("user on layout", user)
   if(!user){
     return redirect("/auth/login")
   }

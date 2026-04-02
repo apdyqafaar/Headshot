@@ -71,5 +71,11 @@ export const config={
       maxFileSize:10 * 1024 * 1024, //100MB
       allowedImageTypes:["image/jpeg", "image/png", "image/jpg", "image/webp"],
       maxStyles:5
+   },
+
+   // redis
+   upstash:{
+      url:process.env.UPSTASH_REDIS_REST_URL ||"",
+      token:process.env.UPSTASH_REDIS_REST_TOKEN ||"",
    }
 }

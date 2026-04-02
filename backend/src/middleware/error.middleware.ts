@@ -6,7 +6,12 @@ import {Request, Response, NextFunction} from "express"
 
 export const errorMiddleware=(err:Error,req:Request, res:Response,  next:NextFunction)=>{
 
-    loger.error(err.message)
+    loger.error(err.stack||err.message),{
+        message:err.message,
+        name:err.name,
+        path:req.path,
+        method:req.method,
+    }
     // handle operational error
     if(err instanceof appError){
         const errors= err instanceof validationErrors?err.errors:undefined

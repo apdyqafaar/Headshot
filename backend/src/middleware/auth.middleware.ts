@@ -57,3 +57,13 @@ export const authenticate=async(req:Request, res:Response, next:NextFunction):Pr
    }
 }
 
+export const authorize=(role:UserRole, msg?:string)=>{
+   return (req:Request, res:Response, next:NextFunction)=>{
+      const userRole=req.user?.role
+      if(role !== userRole){
+        throw new UnauthorizedError(msg || "Unauthorized")
+      }
+      next()
+   }
+}
+
