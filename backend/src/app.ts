@@ -64,7 +64,7 @@ app.use(cookieParser())
 // health check
 app.get("/health",apiRateLimitConfig.general, (req, res, next)=>{
     return successResponse(res, { status:"ok",
-            message:"server is working healthily...",
+            message:"server is working healthily..., everything looks great",
             timeStamp:new Date().toISOString()},
             "server is working healthily...",
         )
