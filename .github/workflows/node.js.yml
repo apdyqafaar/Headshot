@@ -41,14 +41,14 @@ jobs:
       # Step 4: Install dependencies
       - name: 📦 Install dependencies with Bun
         run: |
-          cd ${{ github.workspace }}/backend
+          cd ${{ github.workspace }}
           export PATH="$HOME/.bun/bin:$PATH"
           bun install
       
       # Step 5: Build the project
       - name: 🏗️ Build the project
         run: |
-          cd ${{ github.workspace }}/backend
+          cd ${{ github.workspace }}
           export PATH="$HOME/.bun/bin:$PATH"
           bun run build
       
